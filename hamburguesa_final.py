@@ -22,25 +22,43 @@ def create_table(conn):
 
 # funcion para saber si la opcion es valida
 def validate_user_selection(selection):
-    return isinstance(selection, int) and selection >0 and selection < 6
+    return isinstance(selection, int) and selection >0 and selection < 7
 
 def get_hamburguers(conn):
     print()
     print("-------------------------------")
     print('LISTA DE HAMBURGUESAS DISPONIBLES')
     print("-------------------------------")
-    print('Nombre \t\t\t Precio \t\t\t Tamaño')
+    print('ID \t\t\tNombre \t\t\t Precio \t\t\t Tamaño')
     sql = '''
         SELECT 
-            name, price, size
+            rowid, name, price, size
         FROM
             hamburguer
     '''
     cursor = conn.execute(sql)
     for row in cursor:
-        print(f'{row[0]} \t\t\t {row[1]} \t\t\t {row[2]}')
+        print(f'{row[0]} \t\t\t {row[1]} \t\t\t {row[2]}\t\t\t{3}')
     print('----------------------------------')
     print()
+
+def detete_hamburguer(conn):
+    
+    rowid = input('Ingresa el ID de la hamurguesa que quieres eliminar:')
+    try:
+        sql = '''
+            DELETE FROM hamburguer
+            WHERE 
+            rowid = ?
+        '''
+        values = (rowid,)
+        cursor = conn.execute(sql, values)
+        conn.commit()
+        print('Hamburguesa eliminada correctamente')
+    except Exception as e:
+        print('Falla al eliminar:')
+        print(e)
+
 
 def get_hamburguer(conn,rowid=None):
     if not rowid:
@@ -57,7 +75,7 @@ def get_hamburguer(conn,rowid=None):
     cursor = conn.execute(sql,values)
 
     data = cursor.fetchone()
-
+    
     if data is not None:
         print('-----------------------')
         print('DETALLE DE HAMBURGUESA')
@@ -85,7 +103,7 @@ def create_hamburguers(conn):
         VALUES (?, ?, ?, ?)
     '''
     values = (name, size, price, ingredients)
-
+    
     conn.execute(sql, values)
     conn.commit()
 
@@ -127,12 +145,30 @@ def update_data(conn):
 
     column = input('Ingresa el nombre de la columna que deseas modificar: ')
     new_value = input('Ingresa el nuevo valor de dicha columna: ')
+    try:
+        sql = f'''
+            UPDATE hamburguer 
+            SET
+                {column} = ?
+            WHERE
+                rowid = ?
+        '''
+        #sql.format(column)
+        values = (new_value, rowid)
+        cursor = conn.execute(sql, values)
+        conn.commit()
 
-    sql = '''
-        
-    '''
+        if cursor.rowcount < 1:
+            #error
+            print('No funciono :(')
+        else:
+            #success
+            print('Si funciono!')
+    except Exception as e:
+        print('algo falló en el intento :(')
+        print(e)
 
-
+    
 
 def handle_user_selection(selection, conn):
     if selection == 1:
@@ -143,8 +179,10 @@ def handle_user_selection(selection, conn):
         create_hamburguers(conn)
     elif selection == 4:
         get_hamb_name(conn)
-    else:
+    elif selection == 5:
         update_data(conn)
+    else:
+        detete_hamburguer(conn)
 
 def main():
     getOut = 'N'
@@ -157,7 +195,8 @@ def main():
         print('2. Ver detalles de una hamburguesa')
         print('3. Agregar nueva hamburguesa')
         print('4. Ver detalles de una hamburguesa por nombre')
-        print('5. Actualizar una hamburguesa\n')
+        print('5. Actualizar una hamburguesa')
+        print('6. Eliminar una hamburguesa\n')
         selection = int(input('¿Qué opción eliges? '))
         if validate_user_selection(selection):
             handle_user_selection(selection, conn)
@@ -168,4 +207,4 @@ def main():
         else:
             print("Tu valor que ingresaste es invalido, sorrynotsorry")
 
-main() 
+main()

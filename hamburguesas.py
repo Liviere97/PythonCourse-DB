@@ -98,16 +98,19 @@ def handle_user_selection(selection , conn):
         create_hamburguer(conn) 
 
 def main():
-    conn = create_or_get_database()
-    create_tables(conn)
-    print('BIENVENIDO A HAMBURGUESAS EL PARIENTE\n')
-    print('MENU DE OPCIONES\n')
-    print('1 Ver hamburguesas disponibles')
-    print('2 agregar hamburguesa\n')
-    print('3. Agregar nueva hamburguesa\n')
-    selection = int (input('Que opcion eliges?'  ))
-    if validate_user_selection(selection):
-        handle_user_selection(selection, conn)
-    else :
-        print('ingresaste valor invalido')  
+    getOut = 'N'
+    while getOut == 'N':
+
+      conn = create_or_get_database()
+      create_tables(conn)
+      print('BIENVENIDO A HAMBURGUESAS EL PARIENTE\n')
+      print('MENU DE OPCIONES\n')
+      print('1 Ver hamburguesas disponibles')
+      print('2 agregar hamburguesa\n')
+      print('3. Agregar nueva hamburguesa\n')
+      selection = int (input('Que opcion eliges?'  ))
+      if validate_user_selection(selection):
+          handle_user_selection(selection, conn)
+      else :
+          print('ingresaste valor invalido')  
 main()          
